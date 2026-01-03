@@ -1,2 +1,5 @@
 MAPBOX_TOKEN=MASUKKAN_TOKEN_MU_DISINI
 APP_URL=https://litera-id.netlify.app/
+
+
+trigger rebuild
