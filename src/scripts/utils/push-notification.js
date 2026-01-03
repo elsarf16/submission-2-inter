@@ -40,10 +40,30 @@ const requestNotificationPermission = async () => {
 
 const registerServiceWorker = async () => {
   try {
-    const registration = await navigator.serviceWorker.register(
+    // Cek apakah service worker sudah terdaftar
+    let registration = await navigator.serviceWorker.getRegistration();
+    if (registration) {
+      console.log("Service Worker sudah terdaftar:", registration);
+      return registration;
+    }
+    
+    // Jika belum, daftarkan service worker
+    registration = await navigator.serviceWorker.register(
       "/sw.js"
     );
     console.log("Service Worker berhasil didaftarkan:", registration);
+    
+    // Tunggu service worker aktif
+    if (registration.installing) {
+      await new Promise((resolve) => {
+        registration.installing.addEventListener('statechange', function() {
+          if (this.state === 'activated') {
+            resolve();
+          }
+        });
+      });
+    }
+    
     return registration;
   } catch (error) {
     console.error("Error saat mendaftarkan Service Worker:", error);
@@ -53,39 +73,82 @@ const registerServiceWorker = async () => {
 
 const subscribePushNotification = async (registration) => {
   try {
+    if (!registration || !registration.pushManager) {
+      console.error("Registration atau pushManager tidak tersedia");
+      return null;
+    }
+
     // Cek apakah sudah ada subscription aktif
     let subscription = await registration.pushManager.getSubscription();
     if (subscription) {
       console.log("Push Notification sudah terdaftar:", subscription);
       return subscription;
     }
+    
     // Jika belum ada, baru subscribe
+    const vapidKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      applicationServerKey: vapidKey,
     });
     console.log("Push Notification berhasil didaftarkan:", subscription);
     return subscription;
   } catch (error) {
     console.error("Error saat mendaftarkan Push Notification:", error);
+    if (error.name === 'NotAllowedError') {
+      alert('Izin push notification ditolak. Silakan aktifkan di pengaturan browser.');
+    } else if (error.name === 'NotSupportedError') {
+      alert('Browser tidak mendukung push notification.');
+    } else {
+      alert('Gagal mendaftarkan push notification: ' + error.message);
+    }
     return null;
   }
 };
 
 const initializePushNotification = async () => {
-  if (!checkNotificationSupport()) return;
+  if (!checkNotificationSupport()) {
+    alert('Browser Anda tidak mendukung notifikasi.');
+    return null;
+  }
 
   const permissionGranted = await requestNotificationPermission();
-  if (!permissionGranted) return;
+  if (!permissionGranted) {
+    alert('Izin notifikasi diperlukan untuk menggunakan fitur ini.');
+    return null;
+  }
+
+  if (!('serviceWorker' in navigator)) {
+    alert('Browser Anda tidak mendukung service worker.');
+    return null;
+  }
 
   const registration = await registerServiceWorker();
-  if (!registration) return;
+  if (!registration) {
+    alert('Gagal mendaftarkan service worker.');
+    return null;
+  }
+
+  // Pastikan service worker sudah aktif
+  if (registration.waiting) {
+    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+  }
+  if (registration.installing) {
+    await new Promise((resolve) => {
+      registration.installing.addEventListener('statechange', function() {
+        if (this.state === 'activated') {
+          resolve();
+        }
+      });
+    });
+  }
 
   const subscription = await subscribePushNotification(registration);
-  if (!subscription) return;
+  if (!subscription) {
+    alert('Gagal membuat subscription push notification.');
+    return null;
+  }
 
-  // Di sini Anda bisa mengirim subscription ke server Anda
-  // untuk menyimpan endpoint push notification
   return subscription;
 };
 

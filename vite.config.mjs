@@ -1,8 +1,9 @@
 import { defineConfig } from "vite";
 import path from "path";
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig({
+  base: "./", // ⬅️ INI KUNCI UTAMA
   build: {
     outDir: "dist",
     emptyOutDir: true,
@@ -19,8 +20,8 @@ export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [
-        { src: 'sw-assets.json', dest: '' }
+        { src: "sw-assets.json", dest: "" }
       ]
     })
-  ]
+  ],
 });
