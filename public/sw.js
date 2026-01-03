@@ -11,19 +11,17 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
       console.log('Caching static assets...');
+      // Jika STATIC_ASSETS kosong atau ada error, tetap lanjutkan
+      if (STATIC_ASSETS.length === 0) {
+        console.log('No static assets to cache');
+        return Promise.resolve();
+      }
       return cache.addAll(STATIC_ASSETS)
         .then(() => console.log('Static assets cached successfully'))
         .catch(error => {
           console.error('Failed to cache static assets:', error);
-          STATIC_ASSETS.forEach(async (asset) => {
-            try {
-              await fetch(asset);
-              console.log('Asset OK:', asset);
-            } catch (e) {
-              console.error('Asset failed:', asset, e);
-            }
-          });
-          throw error;
+          // Jangan throw error, biarkan service worker tetap terinstall
+          return Promise.resolve();
         });
     })
   );

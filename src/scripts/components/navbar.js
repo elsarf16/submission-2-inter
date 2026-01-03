@@ -13,7 +13,7 @@ const Navbar = {
             <li><a href="#/" id="home-link">Beranda</a></li>
             ${loggedIn ? `<li><a href="#/add" id="add-story-link">Tambah Cerita</a></li>` : ''}
             ${loggedIn ? `<li><a href="#/liked" id="liked-link">Liked Stories</a></li>` : ''}
-            ${loggedIn ? `<li><button id="subscribe-btn" class="btn-outline" style="margin-left:8px;">Subscribe Notifikasi</button></li>` : ''}
+            ${loggedIn ? `<li><button id="subscribe-btn" class="nav-subscribe-btn">Subscribe Notifikasi</button></li>` : ''}
           </ul>
           <div class="auth-buttons">
             ${
@@ -81,7 +81,10 @@ const Navbar = {
       // Update button text on load
       await updateButtonText();
 
-      subscribeBtn.onclick = async () => {
+      subscribeBtn.onclick = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         if (!('serviceWorker' in navigator)) {
           alert('Browser Anda tidak mendukung push notification.');
           return;
@@ -96,13 +99,28 @@ const Navbar = {
           // Ensure service worker is registered
           let registration = await navigator.serviceWorker.getRegistration();
           if (!registration) {
+            console.log('Service worker belum terdaftar, mendaftarkan...');
             registration = await navigator.serviceWorker.register('/sw.js');
-            // Wait a bit for service worker to be ready
-            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Wait for service worker to be ready
+            if (registration.installing) {
+              await new Promise((resolve) => {
+                registration.installing.addEventListener('statechange', function() {
+                  if (this.state === 'activated') {
+                    resolve();
+                  }
+                });
+              });
+            } else if (registration.waiting) {
+              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              await new Promise(resolve => setTimeout(resolve, 200));
+            } else {
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
           }
 
-          if (!registration) {
-            alert('Gagal mendaftarkan service worker.');
+          if (!registration || !registration.pushManager) {
+            alert('Gagal mendaftarkan service worker atau push manager tidak tersedia.');
             return;
           }
 
@@ -118,6 +136,7 @@ const Navbar = {
               await updateButtonText();
             } else {
               subscribeBtn.disabled = false;
+              await updateButtonText();
             }
           } else {
             // Subscribe
@@ -130,6 +149,7 @@ const Navbar = {
                 await updateButtonText();
               } else {
                 subscribeBtn.disabled = false;
+                await updateButtonText();
               }
             } else {
               subscribeBtn.disabled = false;
@@ -138,7 +158,7 @@ const Navbar = {
           }
         } catch (error) {
           console.error('Error in subscribe/unsubscribe:', error);
-          alert('Terjadi kesalahan: ' + error.message);
+          alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
           subscribeBtn.disabled = false;
           await updateButtonText();
         }
