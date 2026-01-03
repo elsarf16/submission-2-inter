@@ -1,0 +1,2 @@
+MAPBOX_TOKEN=MASUKKAN_TOKEN_MU_DISINI
+APP_URL=https://dynamic-bunny-e94a7a.netlify.app/#/

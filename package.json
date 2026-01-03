@@ -1,0 +1,19 @@
+{
+  "name": "dicoding-story-spa",
+  "version": "1.0.0",
+  "description": "Dicoding Story SPA Final Submission",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "postbuild": "node generate-sw-assets.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vite-plugin-static-copy": "^3.0.0",
+    "workbox-cli": "^7.3.0"
+  },
+  "type": "module"
+}
