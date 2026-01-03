@@ -5,7 +5,8 @@ const Register = {
     return `
       <section class="auth-container">
         <div class="auth-box">
-          <h1>Daftar</h1>
+          <h1>Halaman Register</h1>
+          <h2>Silahkan Masukkan Data Anda.</h2>
           <form id="register-form">
             <label for="register-name">Nama:</label>
             <input type="text" id="register-name" required>

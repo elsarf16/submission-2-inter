@@ -419,10 +419,21 @@ body {
 }
 
 .auth-box h1 {
-  font-size: 2rem;
-  color: #1e3a5f;
-  margin-bottom: 0.5rem;
+  font-size: 2.4rem;
+  font-weight: 700; /* bold tapi elegan */
+  color: #0f2a44;
+  margin-bottom: 0.4rem;
+  text-align: center;
 }
+
+.auth-box h2 {
+  font-size: 1.3rem;
+  font-weight: 400; /* tidak bold */
+  color: #3a5f7d;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
 
 .auth-box p {
   font-size: 0.95rem;

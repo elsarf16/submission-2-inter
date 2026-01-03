@@ -7,7 +7,8 @@ const Login = {
     return `
       <section class="auth-container">
         <div class="auth-box">
-          <h1>Masuk</h1>
+          <h1>Halaman Login</h1>
+          <h2>Silahkan Login Terlebih Dahulu.</h2>
           <form id="login-form">
             <label for="login-email">Email:</label>
             <input type="email" id="login-email" required>
