@@ -1,8 +1,8 @@
 {
   "name": "LiTera.id",
   "short_name": "LiTera",
-  "id": "/",
-  "start_url": "/",
+  "id": "/#/",
+  "start_url": "/#/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
