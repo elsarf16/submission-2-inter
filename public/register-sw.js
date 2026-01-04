@@ -1,9 +1,13 @@
-if ('serviceWorker' in navigator) {
+if (
+  'serviceWorker' in navigator &&
+  location.protocol === 'https:' &&
+  location.hostname !== 'localhost'
+) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('./sw.js')
       .then(reg => {
-        console.log('Service Worker registered successfully:', reg);
-        // Check for updates
+        console.log('Service Worker registered (production):', reg);
+
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           newWorker.addEventListener('statechange', () => {
