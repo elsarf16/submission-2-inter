@@ -1,6 +1,6 @@
-const CACHE_NAME = "litera-cache-v1";
-const STATIC_CACHE = "static-cache-v1";
-const DYNAMIC_CACHE = "dynamic-cache-v1";
+const CACHE_NAME = "litera-cache-v2";
+const STATIC_CACHE = "static-cache-v2";
+const DYNAMIC_CACHE = "dynamic-cache-v2";
 const STATIC_ASSETS = [
   // Akan diisi otomatis oleh script copy-sw-assets-to-swjs.js
 ];
@@ -104,8 +104,8 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => {
           if (event.request.mode === "navigate") {
-            return caches.match("/");
-          }
+  return caches.match("/index.html");
+}
           return new Response("Offline content not available");
         });
     })
